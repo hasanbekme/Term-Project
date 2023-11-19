@@ -62,7 +62,7 @@ class Checker:
     @staticmethod
     def isCommentLine(line: str):
         # check if the line is comment line
-        return line != "" and line.strip()[0] == "#"
+        return line.strip() != "" and line.strip()[0] == "#"
 
     @staticmethod
     def isEmptyLine(line: str):

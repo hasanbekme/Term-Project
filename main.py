@@ -1,7 +1,12 @@
 from cmu_graphics import *
 from os import path
-from widget import CodeSnippet, ErrorDisplay
+from typing import Union
+from widget import CodeSnippet, InfoDisplay, ResponsiveGeometry
 from checkers import Checker
+
+
+def setBackgroundColor(app, color: Union[str, rgb]) -> None:
+    drawRect(0, 0, app.width, app.height, fill=color)
 
 
 def onAppStart(app):
@@ -18,21 +23,42 @@ def onAppStart(app):
     # initialize code displayer
     app.snippet = CodeSnippet(
         app,
-        coords=(10, 20),
-        width=app.width // 2 - 50,
-        height=app.height,
+        geometry=ResponsiveGeometry(app, 0.02, 0.1, 0.46, 0.88),
         content=app.content.splitlines(),
     )
     # initialize code error displayer
-    app.errorDisplay = ErrorDisplay(
+    app.errorDisplay = InfoDisplay(
         app,
-        coords=(app.width // 2 + 20, 20),
-        width=app.width // 2 - 50,
-        errors=app.checker.getAllViolations(),
+        setSelectedLine=app.snippet.setSelectedLine,
+        geometry=ResponsiveGeometry(app, 0.52, 0.1, 0.46, 0.88),
+        content=app.checker.getAllViolations(),
     )
 
 
+def onKeyPress(app, key):
+    if key == "down":
+        app.snippet.scrollDown()
+    elif key == "up":
+        app.snippet.scrollUp()
+
+
+def onMousePress(app, x, y):
+    app.snippet.mousePress(x, y)
+    app.errorDisplay.mousePress(x, y)
+
+
+def onMouseDrag(app, x, y):
+    app.snippet.mouseDrag(x, y)
+    app.errorDisplay.mouseDrag(x, y)
+
+
+def onMouseRelease(app, x, y):
+    app.snippet.mouseRelease(x, y)
+    app.errorDisplay.mouseRelease(x, y)
+
+
 def redrawAll(app):
+    setBackgroundColor(app, color=rgb(50, 170, 170))
     # displat the code and foud errors
     app.snippet.display()
     app.errorDisplay.display()

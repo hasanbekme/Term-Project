@@ -1,0 +1,1 @@
+_myFunction = "Some function"
