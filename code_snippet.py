@@ -54,9 +54,7 @@ class CodeSnippet(BaseGeometry):
             self.x + self.width - 20,
             self.y
             + 20
-            + (self.height - 40 - self.scrollHeight)
-            * self.scroll
-            / self.scrollSize,
+            + (self.height - 40 - self.scrollHeight) * self.scroll / self.scrollSize,
             20,
             self.scrollHeight,
         )
@@ -69,26 +67,21 @@ class CodeSnippet(BaseGeometry):
         elif hasPressed(x, y, scrollDimensions[2]):
             self.scrollDown()
         elif hasPressed(x, y, scrollDimensions[1]):
-            self.scrollDrag = y
+            self.scrollDrag = (y, self.scroll)
         elif hasPressed(x, y, (self.x, self.y, self.width, self.height)):
-            self.selectedLine = (
-                self.scroll + (y - self.y) // self._lineHeight + 1
-            )
+            self.selectedLine = self.scroll + (y - self.y) // self._lineHeight + 1
 
     def mouseDrag(self, x, y):
         if self.scrollDrag:
             change = (
-                (y - self.scrollDrag)
-                / (self.height - 40 - self.scrollHeight)
-                * self.scrollSize
+                (y - self.scrollDrag[0]) / (self.height - 40) * (self.scrollSize + 20)
             )
-            if 0 <= self.scroll + int(change) <= self.scrollSize:
-                self.scroll += int(change)
+            if 0 <= int(self.scrollDrag[1] + change) <= self.scrollSize:
+                self.scroll = int(self.scrollDrag[1] + change)
             elif 0 > self.scroll + int(change):
                 self.scroll = 0
             else:
                 self.scroll = self.scrollSize
-            self.scrollDrag = y
 
     def mouseRelease(self, x, y):
         if self.scrollDrag:

@@ -12,10 +12,10 @@ def setBackgroundColor(app, color: Union[str, rgb]) -> None:
 
 
 def onAppStart(app):
-    filePath = ""
+    filePath = "source.py"
     # prompt user until enters valid python file path
-    while not path.exists(filePath) or not filePath.endswith(".py"):
-        filePath = input("Please enter your python file path: ")
+    # while not path.exists(filePath) or not filePath.endswith(".py"):
+    #     filePath = input("Please enter your python file path: ")
     # save file path and open code content
     app.filePath = filePath
     codeFile = open(app.filePath, "r")
@@ -61,6 +61,7 @@ def onMouseRelease(app, x, y):
 
 def redrawAll(app):
     setBackgroundColor(app, color=rgb(50, 170, 170))
+    drawImage("./assets/python-file.png", 10, 10)
     # displat the code and foud errors
     app.snippet.display()
     app.errorDisplay.display()

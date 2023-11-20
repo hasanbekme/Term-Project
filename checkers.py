@@ -61,12 +61,17 @@ class Checker:
 
     @staticmethod
     def isCommentLine(line: str):
-        # check if the line is comment line
+        # return true if line is comment line
         return line.strip() != "" and line.strip()[0] == "#"
+    
+    @staticmethod
+    def isDunderMethod(name: str):
+        # return True if function is dunder method
+        return len(name) > 4 and name[:2] == name[-2:] == '__'
 
     @staticmethod
     def isEmptyLine(line: str):
-        # check if line is empty string
+        # return True when line is empty
         return line.strip() == ""
 
     @staticmethod
@@ -132,7 +137,7 @@ class Checker:
         # check every function name in the code for camel-cased
         violations = []
         for function in self.extractor.functions:
-            if not Checker.isCamelCased(name=function.name):
+            if not (Checker.isCamelCased(name=function.name) or Checker.isDunderMethod(name=function.name)):
                 violations.append(
                     StyleViolation(
                         message=f"Function name {function.name} is not camel cased",
