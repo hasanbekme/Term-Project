@@ -1,7 +1,9 @@
 from cmu_graphics import *
 from os import path
 from typing import Union
-from widget import CodeSnippet, InfoDisplay, ResponsiveGeometry
+from helpers import ResponsiveGeometry
+from code_snippet import CodeSnippet
+from info_display import InfoDisplay
 from checkers import Checker
 
 
