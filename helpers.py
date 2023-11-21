@@ -1,5 +1,4 @@
 from typing import Union, Tuple
-from cmu_graphics.shape_logic import loadImageFromStringReference
 
 
 def hasPressed(x: int, y: int, box: Tuple[int]) -> bool:
@@ -49,6 +48,10 @@ class ResponsiveGeometry:
             else self.app.height * self._height
         )
 
+    @property
+    def shape(self):
+        return {"width": self.width, "height": self.height}
+
     def __call__(self) -> tuple:
         return (self.x, self.y)
 
@@ -76,7 +79,7 @@ class BaseGeometry:
 
     @property
     def coords(self):
-        return (self.x, self.y)
+        return self.geometry()
 
     @property
     def visibleLines(self) -> int:
