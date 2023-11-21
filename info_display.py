@@ -1,5 +1,5 @@
 from cmu_graphics import *
-from typing import List, Union, Callable
+from typing import List, Callable
 from helpers import hasPressed, BaseGeometry, ResponsiveGeometry
 from checkers import StyleViolation
 
@@ -16,17 +16,21 @@ class InfoDisplay(BaseGeometry):
         self.app = app
         self.background = "white"
         self.border = (1, "gray")
-        self.content = content
         self.textColor = "red"
         self.fontSize = 14
-        self.scroll = 0
-        self.scrollSize = len(self.content)
-        self.scrollHovered = False
+        
+        self.setContent(content=content)
+        
         self.scrollHoverColor = rgb(120, 56, 32)
         self.scrollHeight = 60
         self.scrollDrag = None
-        self.selectedLine = None
         self.setSelectedLine = setSelectedLine
+        
+    def setContent(self, content: List[StyleViolation]):
+        self.content = content
+        self.scroll = 0
+        self.scrollSize = max(len(self.content), 1)
+        self.selectedLine = None
 
     def scrollUp(self):
         if self.scroll > 0:

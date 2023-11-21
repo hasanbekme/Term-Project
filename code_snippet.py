@@ -15,14 +15,19 @@ class CodeSnippet(BaseGeometry):
         self.app = app
         self.background = "white"
         self.border = (1, "gray")
-        self.content = content
         self.textColor = "black"
         self.fontSize = 14
-        self.scroll = 0
-        self.scrollSize = len(self.content)
+        
+        self.setContent(content=content)
+        
         self.scrollHeight = 60
         self.scrollDrag = None
-        self.selectedLine = 10
+
+    def setContent(self, content: str):
+        self.content = content or ''
+        self.scroll = 0
+        self.scrollSize = max(len(self.content), 1)
+        self.selectedLine = None
 
     def scrollUp(self):
         if self.scroll > 0:

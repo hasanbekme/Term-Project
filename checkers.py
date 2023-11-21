@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 import ast
 
 
@@ -54,10 +54,11 @@ class StyleViolation:
 
 
 class Checker:
-    def __init__(self, context) -> None:
-        self.context = context
+    def __init__(self, content: Union[List, None]) -> None:
+        self.content = content
         self.extractor = ContentExtractor()
-        self.extractor.visit(ast.parse(self.context))
+        if self.content:
+            self.extractor.visit(ast.parse(self.content))
 
     @staticmethod
     def isCommentLine(line: str):
@@ -87,7 +88,7 @@ class Checker:
 
     def checkAndrewId(self) -> List[StyleViolation]:
         # iterate through every comment line
-        for line in self.context.splitlines():
+        for line in self.content.splitlines():
             # check if andrew id exist in the line
             if Checker.isCommentLine(line):
                 if "andrewid" in line.lower() or "andrew id" in line.lower():
@@ -97,7 +98,7 @@ class Checker:
 
     def checkFullName(self) -> List[StyleViolation]:
         # iterate through every comment line
-        for line in self.context.splitlines():
+        for line in self.content.splitlines():
             # check if commment contains full name info
             if Checker.isCommentLine(line):
                 if "fullname" in line.lower() or "full name" in line.lower():
@@ -122,7 +123,7 @@ class Checker:
     def checkLineLengths(self) -> List[StyleViolation]:
         # go through every line and check if it exceeds from 80 characters
         violations = []
-        for index, line in enumerate(self.context.splitlines()):
+        for index, line in enumerate(self.content.splitlines()):
             if len(line) > 80:
                 violations.append(
                     StyleViolation(
@@ -151,7 +152,7 @@ class Checker:
         numberOfComments = 0
 
         # count the number of total comments in the code
-        for line in self.context.splitlines():
+        for line in self.content.splitlines():
             if Checker.isCommentLine(line):
                 numberOfComments += 1
 
@@ -184,6 +185,8 @@ class Checker:
         return violations
 
     def getAllViolations(self) -> List[StyleViolation]:
+        if not self.content:
+            return []
         # call every checker methods of parent class
         allViolations = []
         for attribute in dir(self):
