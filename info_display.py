@@ -18,14 +18,14 @@ class InfoDisplay(BaseGeometry):
         self.border = (1, "gray")
         self.textColor = "red"
         self.fontSize = 14
-        
+
         self.setContent(content=content)
-        
+
         self.scrollHoverColor = rgb(120, 56, 32)
         self.scrollHeight = 60
         self.scrollDrag = None
         self.setSelectedLine = setSelectedLine
-        
+
     def setContent(self, content: List[StyleViolation]):
         self.content = content
         self.scroll = 0
@@ -53,7 +53,9 @@ class InfoDisplay(BaseGeometry):
             self.x + self.width - 20,
             self.y
             + 20
-            + (self.height - 40 - self.scrollHeight) * self.scroll / self.scrollSize,
+            + (self.height - 40 - self.scrollHeight)
+            * self.scroll
+            / self.scrollSize,
             20,
             self.scrollHeight,
         )
@@ -68,7 +70,9 @@ class InfoDisplay(BaseGeometry):
         elif hasPressed(x, y, scrollDimensions[1]):
             self.scrollDrag = (y, self.scroll)
         elif hasPressed(x, y, (self.x, self.y, self.width, self.height)):
-            self.selectedLine = int(self.scroll + (y - self.y) // self._lineHeight + 1)
+            self.selectedLine = int(
+                self.scroll + (y - self.y) // self._lineHeight + 1
+            )
             if self.selectedLine <= len(self.content):
                 self.setSelectedLine(self.content[self.selectedLine - 1].line)
 
@@ -129,19 +133,28 @@ class InfoDisplay(BaseGeometry):
                         opacity=40,
                     )
 
-        # draw the scrollbar
-        drawRect(
-            *self.scrollDimensions[0],
-            fill=rgb(200, 200, 200),
-            border=rgb(100, 100, 100),
-        )
-        drawRect(
-            *self.scrollDimensions[2],
-            fill=rgb(200, 200, 200),
-            border=rgb(100, 100, 100),
-        )
-        drawRect(
-            *self.scrollDimensions[1],
-            fill=rgb(150, 150, 150) if self.scrollDrag else rgb(200, 200, 200),
-            border=rgb(100, 100, 100),
-        )
+            # draw the scrollbar
+            drawRect(
+                *self.scrollDimensions[0],
+                fill=rgb(200, 200, 200),
+                border=rgb(100, 100, 100),
+            )
+            drawRect(
+                *self.scrollDimensions[2],
+                fill=rgb(200, 200, 200),
+                border=rgb(100, 100, 100),
+            )
+            drawRect(
+                *self.scrollDimensions[1],
+                fill=rgb(150, 150, 150)
+                if self.scrollDrag
+                else rgb(200, 200, 200),
+                border=rgb(100, 100, 100),
+            )
+        else:
+            drawLabel(
+                "No styling issues",
+                self.x + self.width / 2,
+                self.y + self.height / 2,
+                size=24,
+            )

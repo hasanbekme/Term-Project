@@ -1,4 +1,5 @@
-from typing import List, Union
+from _ast import ClassDef
+from typing import Any, List, Union
 import ast
 
 
@@ -9,16 +10,27 @@ class Function:
         self.lineNumber = lineNumber
 
 
+class Class:
+    def __init__(self, name: str, lineNumber: int) -> None:
+        self.name = name
+        self.lineNumber = lineNumber
+
+
 class ContentExtractor(ast.NodeVisitor):
     def __init__(self):
         self.variables = set()
         self.functions = set()
+        self.classes = set()
 
     def visit_Assign(self, node):
         # add the variable names to variables list when value assinged
         for target in node.targets:
             if isinstance(target, ast.Name):
                 self.variables.add((target.id, target.lineno))
+        self.generic_visit(node)
+
+    def visit_ClassDef(self, node: ClassDef) -> Any:
+        self.classes.add(Class(name=node.name, lineNumber=node.lineno))
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node):
@@ -54,21 +66,38 @@ class StyleViolation:
 
 
 class Checker:
+    appliedCheckers = set()
+
     def __init__(self, content: Union[List, None]) -> None:
         self.content = content
         self.extractor = ContentExtractor()
         if self.content:
             self.extractor.visit(ast.parse(self.content))
+        self.appliedCheckers.update(Checker.allCheckers())
+
+    @classmethod
+    def allCheckers(cls):
+        checkersList = set()
+        for attribute in dir(cls):
+            if callable(getattr(cls, attribute)) and attribute.startswith(
+                "check"
+            ):
+                checkersList.add(attribute)
+        return checkersList
+
+    @classmethod
+    def setCheckers(cls, newChackers):
+        cls.appliedCheckers = newChackers
 
     @staticmethod
     def isCommentLine(line: str):
         # return true if line is comment line
         return line.strip() != "" and line.strip()[0] == "#"
-    
+
     @staticmethod
     def isDunderMethod(name: str):
         # return True if function is dunder method
-        return len(name) > 4 and name[:2] == name[-2:] == '__'
+        return len(name) > 4 and name[:2] == name[-2:] == "__"
 
     @staticmethod
     def isEmptyLine(line: str):
@@ -119,7 +148,7 @@ class Checker:
                     )
                 )
         return violations
-    
+
     def checkLineLengths(self) -> List[StyleViolation]:
         # go through every line and check if it exceeds from 80 characters
         violations = []
@@ -132,13 +161,15 @@ class Checker:
                     )
                 )
         return violations
-        
 
     def checkFunctionNames(self) -> List[StyleViolation]:
         # check every function name in the code for camel-cased
         violations = []
         for function in self.extractor.functions:
-            if not (Checker.isCamelCased(name=function.name) or Checker.isDunderMethod(name=function.name)):
+            if not (
+                Checker.isCamelCased(name=function.name)
+                or Checker.isDunderMethod(name=function.name)
+            ):
                 violations.append(
                     StyleViolation(
                         message=f"Function name {function.name} is not camel cased",
@@ -184,17 +215,30 @@ class Checker:
                 )
         return violations
 
+    def checkClassNames(self) -> List[StyleViolation]:
+        # check the name of the class it should be capitalized and camle cased
+        violations = []
+        for myClass in self.extractor.classes:
+            if not (
+                myClass.name[0].isupper()
+                and Checker.isCamelCased(myClass.name)
+            ):
+                violations.append(
+                    StyleViolation(
+                        message=f"Class name {myClass.name} is not correct",
+                        line=myClass.lineNumber,
+                    )
+                )
+        return violations
+
     def getAllViolations(self) -> List[StyleViolation]:
         if not self.content:
             return []
         # call every checker methods of parent class
         allViolations = []
-        for attribute in dir(self):
-            if callable(getattr(self, attribute)) and attribute.startswith(
-                "check"
-            ):
-                # collect all the vilolations
-                allViolations.extend(getattr(self, attribute)())
+        for attribute in Checker.appliedCheckers:
+            # collect all the vilolations
+            allViolations.extend(getattr(self, attribute)())
         # sort the style viloations by line number
         allViolations.sort(key=lambda x: x.line)
         return allViolations

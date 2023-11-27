@@ -17,14 +17,14 @@ class CodeSnippet(BaseGeometry):
         self.border = (1, "gray")
         self.textColor = "black"
         self.fontSize = 14
-        
+
         self.setContent(content=content)
-        
+
         self.scrollHeight = 60
         self.scrollDrag = None
 
     def setContent(self, content: str):
-        self.content = content or ''
+        self.content = content or ""
         self.scroll = 0
         self.scrollSize = max(len(self.content), 1)
         self.selectedLine = None
@@ -59,7 +59,9 @@ class CodeSnippet(BaseGeometry):
             self.x + self.width - 20,
             self.y
             + 20
-            + (self.height - 40 - self.scrollHeight) * self.scroll / self.scrollSize,
+            + (self.height - 40 - self.scrollHeight)
+            * self.scroll
+            / self.scrollSize,
             20,
             self.scrollHeight,
         )
@@ -74,12 +76,16 @@ class CodeSnippet(BaseGeometry):
         elif hasPressed(x, y, scrollDimensions[1]):
             self.scrollDrag = (y, self.scroll)
         elif hasPressed(x, y, (self.x, self.y, self.width, self.height)):
-            self.selectedLine = self.scroll + (y - self.y) // self._lineHeight + 1
+            self.selectedLine = (
+                self.scroll + (y - self.y) // self._lineHeight + 1
+            )
 
     def mouseDrag(self, x, y):
         if self.scrollDrag:
             change = (
-                (y - self.scrollDrag[0]) / (self.height - 40) * (self.scrollSize + 20)
+                (y - self.scrollDrag[0])
+                / (self.height - 40)
+                * (self.scrollSize + 20)
             )
             if 0 <= int(self.scrollDrag[1] + change) <= self.scrollSize:
                 self.scroll = int(self.scrollDrag[1] + change)
@@ -138,20 +144,27 @@ class CodeSnippet(BaseGeometry):
                     size=self.fontSize,
                     font="Arial",
                 )
-
-        # draw the scrollbar
-        drawRect(
-            *self.scrollDimensions[0],
-            fill=rgb(200, 200, 200),
-            border=rgb(100, 100, 100),
-        )
-        drawRect(
-            *self.scrollDimensions[2],
-            fill=rgb(200, 200, 200),
-            border=rgb(100, 100, 100),
-        )
-        drawRect(
-            *self.scrollDimensions[1],
-            fill=rgb(150, 150, 150) if self.scrollDrag else rgb(200, 200, 200),
-            border=rgb(100, 100, 100),
-        )
+            
+            # draw the scrollbar
+            drawRect(
+                *self.scrollDimensions[0],
+                fill=rgb(200, 200, 200),
+                border=rgb(100, 100, 100),
+            )
+            drawRect(
+                *self.scrollDimensions[2],
+                fill=rgb(200, 200, 200),
+                border=rgb(100, 100, 100),
+            )
+            drawRect(
+                *self.scrollDimensions[1],
+                fill=rgb(150, 150, 150) if self.scrollDrag else rgb(200, 200, 200),
+                border=rgb(100, 100, 100),
+            )
+        else:
+            drawLabel(
+                "Select your code",
+                self.x + self.width / 2,
+                self.y + self.height / 2,
+                size=24,
+            )
