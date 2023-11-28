@@ -138,6 +138,7 @@ def redrawAll(app):
         app.checkersDialog.display()
         return
     setBackgroundColor(app, color=rgb(50, 170, 170))
+    drawLabel("15-112 style guide", app.width/2, app.height * 0.05, fill="white", size=40)
     app.snippet.display()
     app.errorDisplay.display()
     app.openFileButton.display()

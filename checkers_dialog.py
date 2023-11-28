@@ -57,27 +57,29 @@ class CheckersDialog(BaseGeometry):
         )
 
     def onMouseMove(self, x, y):
-        if hasPressed(x, y, self.centerCoords):
-            self.hovering = int((y - self.centerCoords[1]) / self.labelHeight)
-        else:
-            self.hovering = None
+        if self.isOpen:
+            if hasPressed(x, y, self.centerCoords):
+                self.hovering = int((y - self.centerCoords[1]) / self.labelHeight)
+            else:
+                self.hovering = None
 
     def onMousePress(self, x, y):
-        if hasPressed(x, y, self.centerCoords):
-            pressed = int((y - self.centerCoords[1]) / self.labelHeight)
-            if pressed == len(self.checkers):
-                self.closeDialog()
-                self.app.errorDisplay.setContent(content=app.checker.getAllViolations())
-            else:
-                selectedChecker = self.checkers[pressed]
-                if selectedChecker[0]:
-                    Checker.appliedCheckers.remove(selectedChecker[1])
+        if self.isOpen:
+            if hasPressed(x, y, self.centerCoords):
+                pressed = int((y - self.centerCoords[1]) / self.labelHeight)
+                if pressed == len(self.checkers):
+                    self.closeDialog()
+                    self.app.errorDisplay.setContent(content=app.checker.getAllViolations())
                 else:
-                    Checker.appliedCheckers.add(selectedChecker[1])
-                self.checkers[pressed] = (
-                    not selectedChecker[0],
-                    selectedChecker[1],
-                )
+                    selectedChecker = self.checkers[pressed]
+                    if selectedChecker[0]:
+                        Checker.appliedCheckers.remove(selectedChecker[1])
+                    else:
+                        Checker.appliedCheckers.add(selectedChecker[1])
+                    self.checkers[pressed] = (
+                        not selectedChecker[0],
+                        selectedChecker[1],
+                    )
 
     def display(self):
         # draw the background
